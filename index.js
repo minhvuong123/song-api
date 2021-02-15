@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({limit: '1mb'}));
+app.use(bodyParser.json({limit: '10mb'}));
 app.use('/static', express.static('public'));
 
 // routes

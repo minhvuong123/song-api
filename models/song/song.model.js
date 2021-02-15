@@ -9,9 +9,17 @@ const songSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  song_url: {
+  song_url_image: {
     type: String,
     required: true
+  },
+  song_url_music: {
+    type: String,
+    required: true
+  },
+  song_view: {
+    type: Number,
+    default: 0
   },
   song_id_playlist: {
     type: String,

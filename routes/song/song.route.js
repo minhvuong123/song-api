@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const { rootPath } = require('../../utils');
+const { v1: uuid } = require('uuid');
 const songSchema = require('../../models/song/song.model');
 
 router.get('/', async function (req, res) {
@@ -34,14 +37,43 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
-    const song = new songSchema({
-      song_name: req.body.song.song_name,
-      song_singer: req.body.song.song_singer,
-      song_url: req.body.song.song_url,
-      song_id_playlist: req.body.song.song_id_playlist,
-      created_at: req.body.song.created_at
+
+    const base64Image = req.body.song.song_url_image.split(";base64,")[1];
+    const base64Mp3 = req.body.song.song_url_music.split(";base64,")[1];
+    const extenImage = req.body.imageType;
+    const extenMp3 = req.body.mp3Type === 'mpeg' ? 'mp3' : 'mp3';
+    const imageName = uuid();
+    const mp3Name = uuid();
+    const saveImageUrl = `${path.join(rootPath, 'public/images')}\\${imageName}.${extenImage}`;
+    const sageMp3Url = `${path.join(rootPath, 'public/mp3')}\\${mp3Name}.${extenMp3}`;
+
+    req.body.song.song_url_image = base64Image ? `static/images/${imageName}.${extenImage}` : '';
+    req.body.song.song_url_music = base64Mp3 ? `static/mp3/${mp3Name}.${extenMp3}` : '';
+
+    const { 
+      song_name, 
+      song_singer, 
+      song_url_image, 
+      song_url_music, 
+      song_id_playlist = '', 
+      created_at 
+    } = req.body.song;
+
+    await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
+    
+    await require("fs").writeFileSync(sageMp3Url, base64Mp3, 'base64');
+
+    const song = new songSchema({ 
+      song_name, 
+      song_singer, 
+      song_url_image, 
+      song_url_music, 
+      song_id_playlist, 
+      created_at 
     });
+
     const result = await song.save();
+    
     res.status(200).json({
       song: result
     });
