@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const { rootPath } = require('../../utils');
+const { v1: uuid } = require('uuid');
 const playListSchema = require('../../models/playList/playList.model');
+const categorySchema = require('../../models/category/category.model');
+const countrySchema = require('../../models/country/country.model');
 
 router.get('/', async function (req, res) {
   try {
@@ -34,12 +39,42 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
+
+    const base64Image = req.body.playList.playList_url_image.split(";base64,")[1];
+    const extenImage = req.body.imageType;
+    const imageName = uuid();
+    const saveImageUrl = `${path.join(rootPath, 'public/images/playList')}\\${imageName}.${extenImage}`;
+
+
+    // convert data
+    const category = await categorySchema.where({ _id: req.body.playList.playList_category });
+    const country = await countrySchema.where({ _id: req.body.playList.playList_country });
+    req.body.playList.playList_category = category[0]
+    req.body.playList.playList_country = country[0];
+    req.body.playList.playList_url_image = base64Image ? `static/images/playList/${imageName}.${extenImage}` : '';
+
+    const { 
+      playList_name,
+      playList_category,
+      playList_url_image,
+      playList_country,
+      created_at
+     } = req.body.playList;
+
+    if (playList_url_image) {
+      await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
+    }
+
     const playList = new playListSchema({
-      playList_name: req.body.playList.playList_name,
-      playList_type: req.body.playList.playList_type,
-      created_at: req.body.playList.created_at
+      playList_name,
+      playList_category,
+      playList_url_image,
+      playList_country,
+      created_at
     });
+
     const result = await playList.save();
+
     res.status(200).json({
       playList: result
     });

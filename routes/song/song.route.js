@@ -4,6 +4,8 @@ const path = require('path');
 const { rootPath } = require('../../utils');
 const { v1: uuid } = require('uuid');
 const songSchema = require('../../models/song/song.model');
+const countrySchema = require('../../models/country/country.model');
+const singerSchema = require('../../models/singer/singer.model');
 
 router.get('/', async function (req, res) {
   try {
@@ -47,12 +49,19 @@ router.post('/', async function (req, res) {
     const saveImageUrl = `${path.join(rootPath, 'public/images')}\\${imageName}.${extenImage}`;
     const sageMp3Url = `${path.join(rootPath, 'public/mp3')}\\${mp3Name}.${extenMp3}`;
 
+    // convert data
+    const country = await countrySchema.where({ _id: req.body.song.song_country });
+    const singers = await singerSchema.find({_id: {"$in": req.body.song.song_singer}});
+
+    req.body.song.song_country = country[0];
+    req.body.song.song_singer = singers;
     req.body.song.song_url_image = base64Image ? `static/images/${imageName}.${extenImage}` : '';
     req.body.song.song_url_music = base64Mp3 ? `static/mp3/${mp3Name}.${extenMp3}` : '';
 
     const { 
       song_name, 
       song_singer, 
+      song_country,
       song_url_image, 
       song_url_music, 
       song_id_playlist = '', 
@@ -66,9 +75,10 @@ router.post('/', async function (req, res) {
     const song = new songSchema({ 
       song_name, 
       song_singer, 
+      song_country,
       song_url_image, 
       song_url_music, 
-      song_id_playlist, 
+      song_id_playlist: '', 
       created_at 
     });
 

@@ -1,13 +1,20 @@
 const mongoose = require('mongoose');
+const countrySchema = require('../country/country.model');
+const singerSchema = require('../singer/singer.model');
 
 const songSchema = new mongoose.Schema({
   song_name: {
     type: String,
     required: true
   },
+  song_country: {
+    type: countrySchema.schema,
+    default: {}
+  },
   song_singer: {
-    type: String,
-    required: true
+    type: [singerSchema.schema],
+    required: true,
+    default: []
   },
   song_url_image: {
     type: String,

@@ -15,10 +15,16 @@ app.use('/static', express.static('public'));
 const users = require('./routes/user/user.route');
 const songs = require('./routes/song/song.route');
 const playLists = require('./routes/playList/playList.route');
+const categories = require('./routes/category/category.route');
+const singers = require('./routes/singer/singer.route');
+const countries = require('./routes/country/country.route');
 
 app.use('/users', users);
 app.use('/songs', songs);
 app.use('/playLists', playLists);
+app.use('/categories', categories);
+app.use('/singers', singers);
+app.use('/countries', countries);
 
 mongoose.connect('mongodb://localhost/songApp', { useNewUrlParser: true, useUnifiedTopology: true });
 const connect = mongoose.connection;

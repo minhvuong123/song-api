@@ -1,23 +1,31 @@
 const mongoose = require('mongoose');
 const songSchema = require('../song/song.model');
+const categorySchema = require('../category/category.model');
+const countrySchema = require('../country/country.model');
 
 const playListSchema = new mongoose.Schema({
   playList_name: {
     type: String,
     required: true
   },
+  playList_country: {
+    type: countrySchema.schema,
+    default: {}
+  },
   playList_song: {
     type: [songSchema.schema],
     default: []
   },
-  playList_type: { // hiphop, tetXuan, rap, ...
-    type: String
+  playList_category: {
+    type: categorySchema.schema,
+    default: {}
   },
   playList_url_image: {
     type: String
   },
-  playList_country: {
-    type: String
+  playList_view: {
+    type: Number,
+    default: 0
   },
   created_at: {
     type: String
