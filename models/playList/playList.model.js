@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const songSchema = require('../song/song.model');
 const categorySchema = require('../category/category.model');
 const countrySchema = require('../country/country.model');
+const playListShowSchema = require('../playListShow/playListShow.model');
 
 const playListSchema = new mongoose.Schema({
   playList_name: {
@@ -18,6 +19,10 @@ const playListSchema = new mongoose.Schema({
   },
   playList_category: {
     type: categorySchema.schema,
+    default: {}
+  },
+  playList_listShow: {
+    type: playListShowSchema.schema,
     default: {}
   },
   playList_url_image: {

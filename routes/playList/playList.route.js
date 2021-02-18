@@ -6,10 +6,15 @@ const { v1: uuid } = require('uuid');
 const playListSchema = require('../../models/playList/playList.model');
 const categorySchema = require('../../models/category/category.model');
 const countrySchema = require('../../models/country/country.model');
+const playListShowSchema = require('../../models/playListShow/playListShow.model');
+const mongoose  =  'mongoose';
 
 router.get('/', async function (req, res) {
   try {
     const playLists = await playListSchema.find();
+    // const playListShow = await playListShowSchema.find();
+    // const playLists = await playListSchema.find({"playList_listShow._id": playListShow[0]._id});
+
     res.status(200).json({
       playLists
     });
@@ -49,17 +54,21 @@ router.post('/', async function (req, res) {
     // convert data
     const category = await categorySchema.where({ _id: req.body.playList.playList_category });
     const country = await countrySchema.where({ _id: req.body.playList.playList_country });
-    req.body.playList.playList_category = category[0]
+    const playListShow = await playListShowSchema.where({ _id: req.body.playList.playList_listShow });
+
+    req.body.playList.playList_listShow = playListShow[0];
+    req.body.playList.playList_category = category[0];
     req.body.playList.playList_country = country[0];
     req.body.playList.playList_url_image = base64Image ? `static/images/playList/${imageName}.${extenImage}` : '';
 
-    const { 
+    const {
       playList_name,
       playList_category,
+      playList_listShow,
       playList_url_image,
       playList_country,
       created_at
-     } = req.body.playList;
+    } = req.body.playList;
 
     if (playList_url_image) {
       await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
@@ -68,6 +77,7 @@ router.post('/', async function (req, res) {
     const playList = new playListSchema({
       playList_name,
       playList_category,
+      playList_listShow,
       playList_url_image,
       playList_country,
       created_at

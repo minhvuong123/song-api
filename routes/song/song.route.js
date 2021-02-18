@@ -78,7 +78,7 @@ router.post('/', async function (req, res) {
       song_country,
       song_url_image, 
       song_url_music, 
-      song_id_playlist: '', 
+      song_id_playlist, 
       created_at 
     });
 
