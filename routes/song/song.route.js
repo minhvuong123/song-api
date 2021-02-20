@@ -20,6 +20,20 @@ router.get('/', async function (req, res) {
   }
 })
 
+router.get('/:song_id_playlist', async function (req, res) {
+  try {
+    const { song_id_playlist } = req.params;
+    const songs = await songSchema.find({ song_id_playlist});
+    res.status(200).json({
+      songs
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
 router.get('/:page/:limit', async function (req, res) {
   try {
     const page = +req.params.page - 1 || 0;

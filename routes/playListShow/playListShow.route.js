@@ -36,13 +36,13 @@ router.post('/', async function (req, res) {
   try {
     const playListShow = new playListShowSchema({
       playListShow_name: req.body.playListShow.playListShow_name,
+      playListShow_slug: req.body.playListShow.playListShow_slug,
       created_at: req.body.playListShow.created_at
     });
     const result = await playListShow.save();
     res.status(200).json({
       playListShow: result
     });
-
   } catch (error) {
     res.status(500).json({
       message: 'Server error'

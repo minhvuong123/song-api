@@ -9,6 +9,10 @@ const playListSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  playList_slug: {
+    type: String,
+    required: true
+  },
   playList_country: {
     type: countrySchema.schema,
     default: {}

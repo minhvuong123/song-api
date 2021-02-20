@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { rootPath } = require('../../utils');
+const { rootPath, removeAccents } = require('../../utils');
 const { v1: uuid } = require('uuid');
 const playListSchema = require('../../models/playList/playList.model');
 const categorySchema = require('../../models/category/category.model');
 const countrySchema = require('../../models/country/country.model');
 const playListShowSchema = require('../../models/playListShow/playListShow.model');
-const mongoose  =  'mongoose';
 
 router.get('/', async function (req, res) {
   try {
@@ -17,6 +16,21 @@ router.get('/', async function (req, res) {
 
     res.status(200).json({
       playLists
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
+router.get('/:name', async function (req, res) {
+  try {
+    const { name } = req.params;
+    const playList = await playListSchema.findOne({ playList_slug: name });
+
+    res.status(200).json({
+      playList
     });
   } catch (error) {
     res.status(500).json({
@@ -55,11 +69,13 @@ router.post('/', async function (req, res) {
     const category = await categorySchema.where({ _id: req.body.playList.playList_category });
     const country = await countrySchema.where({ _id: req.body.playList.playList_country });
     const playListShow = await playListShowSchema.where({ _id: req.body.playList.playList_listShow });
-
+    console.log("1");
     req.body.playList.playList_listShow = playListShow[0];
     req.body.playList.playList_category = category[0];
     req.body.playList.playList_country = country[0];
     req.body.playList.playList_url_image = base64Image ? `static/images/playList/${imageName}.${extenImage}` : '';
+
+    const convertString = removeAccents(req.body.playList.playList_name).replace(/ /g, '-');
 
     const {
       playList_name,
@@ -76,6 +92,7 @@ router.post('/', async function (req, res) {
 
     const playList = new playListSchema({
       playList_name,
+      playList_slug: convertString,
       playList_category,
       playList_listShow,
       playList_url_image,
