@@ -2,37 +2,37 @@ const mongoose = require('mongoose');
 const songSchema = require('../song/song.model');
 const categorySchema = require('../category/category.model');
 const countrySchema = require('../country/country.model');
-const playListShowSchema = require('../playListShow/playListShow.model');
+const albumListSchema = require('../albumList/albumList.model');
 
-const playListSchema = new mongoose.Schema({
-  playList_name: {
+const albumSchema = new mongoose.Schema({
+  album_name: {
     type: String,
     required: true
   },
-  playList_slug: {
+  album_slug: {
     type: String,
     required: true
   },
-  playList_country: {
+  album_country: {
     type: countrySchema.schema,
     default: {}
   },
-  playList_song: {
+  album_song: {
     type: [songSchema.schema],
     default: []
   },
-  playList_category: {
+  album_category: {
     type: categorySchema.schema,
     default: {}
   },
-  playList_listShow: {
-    type: playListShowSchema.schema,
+  album_listShow: {
+    type: albumListSchema.schema,
     default: {}
   },
-  playList_url_image: {
+  album_url_image: {
     type: String
   },
-  playList_view: {
+  album_view: {
     type: Number,
     default: 0
   },
@@ -41,4 +41,4 @@ const playListSchema = new mongoose.Schema({
   }
 })
 
-module.exports = mongoose.model('playList', playListSchema);
+module.exports = mongoose.model('album', albumSchema);

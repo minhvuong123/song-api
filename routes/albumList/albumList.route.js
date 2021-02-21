@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const playListShowSchema = require('../../models/playListShow/playListShow.model');
+const albumListSchema = require('../../models/albumList/albumList.model');
 
 router.get('/', async function (req, res) {
   try {
-    const playListShows = await playListShowSchema.find();
+    const albumList = await albumListSchema.find();
     res.status(200).json({
-      playListShows
+      albumList
     });
   } catch (error) {
     res.status(500).json({
@@ -19,10 +19,10 @@ router.get('/:page/:limit', async function (req, res) {
   try {
     const page = +req.params.page - 1 || 0;
     const limit = +req.params.limit || 10;
-    const playListShows = await playListShowSchema.find().skip(page * limit).limit(limit);
-    const count = await playListShowSchema.countDocuments();
+    const albumList = await albumListSchema.find().skip(page * limit).limit(limit);
+    const count = await albumListSchema.countDocuments();
     res.status(200).json({
-      playListShows,
+      albumList,
       count
     });
   } catch (error) {
@@ -34,14 +34,13 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
-    const playListShow = new playListShowSchema({
-      playListShow_name: req.body.playListShow.playListShow_name,
-      playListShow_slug: req.body.playListShow.playListShow_slug,
-      created_at: req.body.playListShow.created_at
+    const albumList = new albumListSchema({
+      albumList_name: req.body.albumList.albumList_name,
+      created_at: req.body.albumList.created_at
     });
-    const result = await playListShow.save();
+    const result = await albumList.save();
     res.status(200).json({
-      playListShow: result
+      albumList: result
     });
   } catch (error) {
     res.status(500).json({
@@ -53,8 +52,8 @@ router.post('/', async function (req, res) {
 
 router.patch('/', async function (req, res) {
   try {
-    const playListShow = await playListShowSchema.where({ _id: req.body.playListShow._id }).updateOne({ ...req.body.playListShow })
-    if (playListShow.ok === 1) {
+    const albumList = await albumListSchema.where({ _id: req.body.albumList._id }).updateOne({ ...req.body.albumList })
+    if (albumList.ok === 1) {
       res.status(200).json({
         status: 'ok'
       });
@@ -70,8 +69,8 @@ router.patch('/', async function (req, res) {
 
 router.post('/delete', async function (req, res) {
   try {
-    const _id = req.body.playListShow._id;
-    const result = await playListShowSchema.deleteOne({ _id });
+    const _id = req.body.albumList._id;
+    const result = await albumListSchema.deleteOne({ _id });
     if (result.deletedCount >= 1) {
       res.status(200).json({
         status: 'ok'

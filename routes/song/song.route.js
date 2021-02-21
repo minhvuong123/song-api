@@ -60,7 +60,7 @@ router.post('/', async function (req, res) {
     const extenMp3 = req.body.mp3Type === 'mpeg' ? 'mp3' : 'mp3';
     const imageName = uuid();
     const mp3Name = uuid();
-    const saveImageUrl = `${path.join(rootPath, 'public/images')}\\${imageName}.${extenImage}`;
+    const saveImageUrl = `${path.join(rootPath, 'public/images/song')}\\${imageName}.${extenImage}`;
     const sageMp3Url = `${path.join(rootPath, 'public/mp3')}\\${mp3Name}.${extenMp3}`;
 
     // convert data
@@ -69,7 +69,7 @@ router.post('/', async function (req, res) {
 
     req.body.song.song_country = country[0];
     req.body.song.song_singer = singers;
-    req.body.song.song_url_image = base64Image ? `static/images/${imageName}.${extenImage}` : '';
+    req.body.song.song_url_image = base64Image ? `static/images/song/${imageName}.${extenImage}` : '';
     req.body.song.song_url_music = base64Mp3 ? `static/mp3/${mp3Name}.${extenMp3}` : '';
 
     const { 
