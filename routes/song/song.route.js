@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const mp3Duration = require('mp3-duration');
 const { rootPath } = require('../../utils');
 const { v1: uuid } = require('uuid');
 const songSchema = require('../../models/song/song.model');
@@ -92,13 +93,22 @@ router.post('/', async function (req, res) {
       song_country,
       song_url_image, 
       song_url_music, 
-      song_id_playlist = '', 
+      song_id_playlist = '',
       created_at 
     } = req.body.song;
 
     await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
     
     await require("fs").writeFileSync(sageMp3Url, base64Mp3, 'base64');
+
+    const song_duration = await new Promise(function(resolve, reject){
+      mp3Duration(sageMp3Url, async function (err, duration) {
+        if (err) {
+          reject(err);
+        }
+        resolve(duration);
+      })
+    }) 
 
     const song = new songSchema({ 
       song_name, 
@@ -107,6 +117,7 @@ router.post('/', async function (req, res) {
       song_url_image, 
       song_url_music, 
       song_id_playlist, 
+      song_duration,
       created_at 
     });
 
@@ -115,7 +126,6 @@ router.post('/', async function (req, res) {
     res.status(200).json({
       song: result
     });
-
   } catch (error) {
     res.status(500).json({
       message: 'Server error'
