@@ -1,4 +1,3 @@
-const { Decimal128 } = require('mongodb');
 const mongoose = require('mongoose');
 const countrySchema = require('../country/country.model');
 const singerSchema = require('../singer/singer.model');
@@ -34,7 +33,7 @@ const songSchema = new mongoose.Schema({
     default: ''
   },
   song_duration: {
-    type: Decimal128,
+    type: Number,
     default: 0
   },
   created_at: {
