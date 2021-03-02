@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const mp3Duration = require('mp3-duration');
 const { rootPath } = require('../../utils');
 const { v1: uuid } = require('uuid');
 const songSchema = require('../../models/song/song.model');
 const countrySchema = require('../../models/country/country.model');
 const singerSchema = require('../../models/singer/singer.model');
+const mm = require('music-metadata');
 
 router.get('/', async function (req, res) {
   try {
@@ -68,63 +68,48 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
-
-    const base64Image = req.body.song.song_url_image.split(";base64,")[1];
     const base64Mp3 = req.body.song.song_url_music.split(";base64,")[1];
-    const extenImage = req.body.imageType;
-    const extenMp3 = req.body.mp3Type === 'mpeg' ? 'mp3' : 'mp3';
     const imageName = uuid();
     const mp3Name = uuid();
-    const saveImageUrl = `${path.join(rootPath, 'public/images/song')}\\${imageName}.${extenImage}`;
-    const sageMp3Url = `${path.join(rootPath, 'public/mp3')}\\${mp3Name}.${extenMp3}`;
+    const saveImageUrl = `${path.join(rootPath, 'public/images/song')}\\${imageName}.jpeg`;
+    const sageMp3Url = `${path.join(rootPath, 'public/mp3')}\\${mp3Name}.mp3`;
+
+    await require("fs").writeFileSync(sageMp3Url, base64Mp3, 'base64'); // save mp3 file
+
+    const metadata = await mm.parseFile(sageMp3Url); // read metadata
+  
+    await require("fs").writeFileSync(saveImageUrl, mm.selectCover(metadata.common.picture).data, 'binary'); // save image file
 
     // convert data
     const country = await countrySchema.where({ _id: req.body.song.song_country });
-    const singers = await singerSchema.find({_id: {"$in": req.body.song.song_singer}});
+    const singers = [];
 
+    // handle list singer and push into singerModel if not exist
+    for (const singer of metadata.common.artist.split(', ')) {
+      const s = await singerSchema.findOne({singer_name: singer});
+
+      if (!s || (s &&  Object.keys(s).length <= 0)) {
+        const singerResult = await singerSchema.create({
+          singer_name: singer,
+          created_at: req.body.song.created_at
+        });
+        singers.push(singerResult);
+      } else {
+        singers.push(s);
+      }
+    }
+
+    req.body.song.song_name = metadata.common.title;
     req.body.song.song_country = country[0];
     req.body.song.song_singer = singers;
-    req.body.song.song_url_image = base64Image ? `static/images/song/${imageName}.${extenImage}` : '';
-    req.body.song.song_url_music = base64Mp3 ? `static/mp3/${mp3Name}.${extenMp3}` : '';
+    req.body.song.song_url_image = `static/images/song/${imageName}.jpeg`;
+    req.body.song.song_url_music = `static/mp3/${mp3Name}.mp3`;
+    req.body.song.song_duration = metadata.format.duration;
 
-    const { 
-      song_name, 
-      song_singer, 
-      song_country,
-      song_url_image, 
-      song_url_music, 
-      song_id_playlist = '',
-      created_at 
-    } = req.body.song;
-
-    await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
-    
-    await require("fs").writeFileSync(sageMp3Url, base64Mp3, 'base64');
-
-    const song_duration = await new Promise(function(resolve, reject){
-      mp3Duration(sageMp3Url, async function (err, duration) {
-        if (err) {
-          reject(err);
-        }
-        resolve(duration);
-      })
-    }) 
-
-    const song = new songSchema({ 
-      song_name, 
-      song_singer, 
-      song_country,
-      song_url_image, 
-      song_url_music, 
-      song_id_playlist, 
-      song_duration,
-      created_at 
-    });
-
-    const result = await song.save();
+    const song = await songSchema.create(req.body.song);
     
     res.status(200).json({
-      song: result
+      song
     });
   } catch (error) {
     res.status(500).json({
