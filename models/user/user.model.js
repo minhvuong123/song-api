@@ -6,8 +6,7 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   user_phone: {
-    type: String,
-    required: true
+    type: String
   },
   user_password: {
     type: String,

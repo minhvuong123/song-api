@@ -7,6 +7,7 @@ const songSchema = require('../../models/song/song.model');
 const countrySchema = require('../../models/country/country.model');
 const singerSchema = require('../../models/singer/singer.model');
 const mm = require('music-metadata');
+const util = require('util');
 
 router.get('/', async function (req, res) {
   try {
@@ -80,8 +81,6 @@ router.post('/', async function (req, res) {
   
     await require("fs").writeFileSync(saveImageUrl, mm.selectCover(metadata.common.picture).data, 'binary'); // save image file
 
-    // convert data
-    const country = await countrySchema.where({ _id: req.body.song.song_country });
     const singers = [];
 
     // handle list singer and push into singerModel if not exist
@@ -100,7 +99,6 @@ router.post('/', async function (req, res) {
     }
 
     req.body.song.song_name = metadata.common.title;
-    req.body.song.song_country = country[0];
     req.body.song.song_singer = singers;
     req.body.song.song_url_image = `static/images/song/${imageName}.jpeg`;
     req.body.song.song_url_music = `static/mp3/${mp3Name}.mp3`;

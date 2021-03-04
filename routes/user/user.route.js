@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const bcrypt = require('bcrypt');
-const { rootPath } = require('../../utils');
+const jwt = require('jsonwebtoken');
+const { rootPath, configToken } = require('../../utils');
 const { v1: uuid } = require('uuid');
 const userSchema = require('../../models/user/user.model');
+const refreshTokenSchema = require('../../models/refreshToken/refreshToken.model');
 
 router.get('/', async function (req, res) {
   try {
@@ -149,18 +151,37 @@ router.post('/register', async function (req, res) {
   }
 })
 
-router.post('/login', async function (req, res) {
+const refreshTokens = {};
+router.post('/login', async function (req, res, next) {
   try {
-    const user_name = req.body.user.user_name;
+    const user_email = req.body.user.user_email;
     const user_password = req.body.user.user_password;
+    const created_at = req.body.user.created_at;
 
-    const user = await userSchema.where({ user_name }).findOne();
+    const user = await userSchema.where({ user_email }).findOne();
 
     if (Object.keys(user).length > 0) {
       const match = await bcrypt.compare(user_password, user.user_password);
       if (match) {
+        const token = jwt.sign({...user}, configToken.secretToken, { expiresIn: configToken.tokenLife });
+        const refreshTokenExist = await refreshTokenSchema.findOne({user_id: user._id});
+        let refreshToken;
+        if (!refreshTokenExist || Object.keys(refreshTokenExist) <= 0) {
+          refreshToken = jwt.sign({...user}, configToken.refreshTokenSecret);
+          refreshTokens[refreshToken] = user;
+
+          // save refresh token into db
+          const refreshTokenModel = new refreshTokenSchema({
+            user_id: user._id,
+            token: refreshToken,
+            created_at: created_at
+          });
+          await refreshTokenModel.save();
+        }
+        
         res.status(200).json({ 
-          status: 'ok'
+          status: 'ok',
+          token
         });
         return;
       }

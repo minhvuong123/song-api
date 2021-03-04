@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const configToken = {
   secretToken: "kiwi",
   refreshTokenSecret: "kiwi_refresh",
-  tokenLife: 60
+  tokenLife: 60000000000
 } 
 
 function verifyJwtToken(token, secretKey) {
