@@ -30,11 +30,16 @@ const albumSchema = new mongoose.Schema({
     default: {}
   },
   album_url_image: {
-    type: String
+    type: String,
+    default: ''
   },
   album_view: {
     type: Number,
     default: 0
+  },
+  album_user_id: {
+    type: String,
+    default: ''
   },
   created_at: {
     type: String

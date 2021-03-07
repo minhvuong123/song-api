@@ -7,7 +7,6 @@ const songSchema = require('../../models/song/song.model');
 const countrySchema = require('../../models/country/country.model');
 const singerSchema = require('../../models/singer/singer.model');
 const mm = require('music-metadata');
-const util = require('util');
 
 router.get('/', async function (req, res) {
   try {
@@ -42,6 +41,20 @@ router.get('/song/:_id', async function (req, res) {
     const song = await songSchema.findOne({ _id});
     res.status(200).json({
       song
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
+router.get('/user/:_id', async function (req, res) {
+  try {
+    const { _id } = req.params;
+    const songs = await songSchema.find({ song_user_id: _id});
+    res.status(200).json({
+      songs
     });
   } catch (error) {
     res.status(500).json({

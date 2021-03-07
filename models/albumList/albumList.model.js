@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const albumListSchema = new mongoose.Schema({
   albumList_name: {
-    type: String,
-    required: true
+    type: String
   },
   created_at: {
     type: String

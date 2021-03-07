@@ -39,6 +39,21 @@ router.get('/:name', async function (req, res) {
   }
 })
 
+router.get('/user/:_id', async function (req, res) {
+  try {
+    const { _id } = req.params;
+    const albums = await albumSchema.find({ album_user_id: _id });
+
+    res.status(200).json({
+      albums
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
 router.get('/:page/:limit', async function (req, res) {
   try {
     const page = +req.params.page - 1 || 0;
@@ -58,37 +73,47 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
-
-    const base64Image = req.body.album.album_url_image.split(";base64,")[1];
+    const base64Image = req.body.album.album_url_image ? req.body.album.album_url_image.split(";base64,")[1] : '';
     const extenImage = req.body.imageType;
     const imageName = uuid();
     const saveImageUrl = `${path.join(rootPath, 'public/images/album')}\\${imageName}.${extenImage}`;
 
-
     // convert data
-    const category = await categorySchema.where({ _id: req.body.album.album_category });
-    const country = await countrySchema.where({ _id: req.body.album.album_country });
-    const albumshow = await albumshowSchema.where({ _id: req.body.album.album_listShow });
-    console.log("1");
-    req.body.album.album_listShow = albumshow[0];
-    req.body.album.album_category = category[0];
-    req.body.album.album_country = country[0];
-    req.body.album.album_url_image = base64Image ? `static/images/album/${imageName}.${extenImage}` : '';
+    let category = {} ;
+    let country = {};
+    let albumshow = {};
+    if (req.body.album.album_listShow) {
+      albumshow = await albumshowSchema.where({ _id: req.body.album.album_listShow });
+    }
+
+    if (req.body.album.album_category) {
+      category = await categorySchema.where({ _id: req.body.album.album_category });
+    }
+
+    if (req.body.album.album_country) {
+      country = await countrySchema.where({ _id: req.body.album.album_country });
+    }
 
     const convertString = removeAccents(req.body.album.album_name).replace(/ /g, '-');
+
+    req.body.album.album_listShow = category && category.length > 0 ? category[0] : {};
+    req.body.album.album_category = country && country.length > 0 ? country[0] : {};
+    req.body.album.album_country = albumshow && albumshow.length > 0 ? albumshow[0] : {};
+
+    if (base64Image) {
+      await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
+      req.body.album.album_url_image = base64Image ? `static/images/album/${imageName}.${extenImage}` : '';
+    }
 
     const {
       album_name,
       album_category,
       album_listShow,
-      album_url_image,
+      album_url_image = '',
       album_country,
+      album_user_id = '',
       created_at
     } = req.body.album;
-
-    if (album_url_image) {
-      await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
-    }
 
     const album = new albumSchema({
       album_name,
@@ -97,8 +122,11 @@ router.post('/', async function (req, res) {
       album_listShow,
       album_url_image,
       album_country,
+      album_user_id,
       created_at
     });
+
+    console.log(album);
 
     const result = await album.save();
 
