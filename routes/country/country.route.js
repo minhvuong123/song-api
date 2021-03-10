@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { removeAccents } = require('../../utils');
 const countrySchema = require('../../models/country/country.model');
 
 router.get('/', async function (req, res) {
@@ -34,8 +35,10 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
+    const convertString = removeAccents(req.body.country.country_name).replace(/ /g, '-');
     const country = new countrySchema({
       country_name: req.body.country.country_name,
+      country_slug: convertString,
       created_at: req.body.country.created_at
     });
     const result = await country.save();

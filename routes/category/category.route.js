@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { removeAccents } = require('../../utils');
 const categorySchema = require('../../models/category/category.model');
 
 router.get('/', async function (req, res) {
@@ -34,8 +35,10 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
+    const convertString = removeAccents(req.body.category.category_name).replace(/ /g, '-');
     const category = new categorySchema({
       category_name: req.body.category.category_name,
+      category_slug: convertString,
       created_at: req.body.category.created_at
     });
     const result = await category.save();

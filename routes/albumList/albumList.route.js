@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { removeAccents } = require('../../utils');
 const albumListSchema = require('../../models/albumList/albumList.model');
 
 router.get('/', async function (req, res) {
@@ -34,8 +35,10 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
+    const convertString = removeAccents(req.body.albumList.albumList_name).replace(/ /g, '-');
     const albumList = new albumListSchema({
       albumList_name: req.body.albumList.albumList_name,
+      albumList_slug: convertString,
       created_at: req.body.albumList.created_at
     });
     const result = await albumList.save();

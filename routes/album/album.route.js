@@ -54,6 +54,20 @@ router.get('/user/:_id', async function (req, res) {
   }
 })
 
+router.get('/albumlist/:_id', async function (req, res) {
+  try {
+    const albums = await albumSchema.find();
+
+    res.status(200).json({
+      albums
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
 router.get('/:page/:limit', async function (req, res) {
   try {
     const page = +req.params.page - 1 || 0;
@@ -96,9 +110,9 @@ router.post('/', async function (req, res) {
 
     const convertString = removeAccents(req.body.album.album_name).replace(/ /g, '-');
 
-    req.body.album.album_listShow = category && category.length > 0 ? category[0] : {};
-    req.body.album.album_category = country && country.length > 0 ? country[0] : {};
-    req.body.album.album_country = albumshow && albumshow.length > 0 ? albumshow[0] : {};
+    req.body.album.album_category = category && category.length > 0 ? category[0] : {};
+    req.body.album.album_country = country && country.length > 0 ? country[0] : {};
+    req.body.album.album_listShow = albumshow && albumshow.length > 0 ? albumshow[0] : {};
 
     if (base64Image) {
       await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
@@ -125,8 +139,6 @@ router.post('/', async function (req, res) {
       album_user_id,
       created_at
     });
-
-    console.log(album);
 
     const result = await album.save();
 
