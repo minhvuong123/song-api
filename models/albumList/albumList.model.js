@@ -7,6 +7,10 @@ const albumListSchema = new mongoose.Schema({
   albumList_slug: {
     type: String
   },
+  albumList_status: {
+    type: Boolean,
+    default: false
+  },
   created_at: {
     type: String
   }

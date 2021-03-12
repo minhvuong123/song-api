@@ -16,6 +16,19 @@ router.get('/', async function (req, res) {
   }
 })
 
+router.get('/status/:status', async function (req, res) {
+  try {
+    const albumList = await albumListSchema.find({albumList_status: req.params.status});
+    res.status(200).json({
+      albumList
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
 router.get('/:page/:limit', async function (req, res) {
   try {
     const page = +req.params.page - 1 || 0;
@@ -53,15 +66,16 @@ router.post('/', async function (req, res) {
 })
 
 
-router.patch('/', async function (req, res) {
+router.patch('/status', async function (req, res) {
   try {
-    const albumList = await albumListSchema.where({ _id: req.body.albumList._id }).updateOne({ ...req.body.albumList })
-    if (albumList.ok === 1) {
-      res.status(200).json({
-        status: 'ok'
-      });
+    // const albumList = await albumListSchema.where({ _id: req.body.albumList._id }).updateOne({ ...req.body.albumList })
+    for (const album of req.body.albums) {
+      await albumListSchema.where({ _id: album._id }).updateOne({ albumList_status: album.albumList_status})
     }
-
+  
+    res.status(200).json({
+      status: 'ok'
+    });
   } catch (error) {
     res.status(500).json({
       status: 'Server error'

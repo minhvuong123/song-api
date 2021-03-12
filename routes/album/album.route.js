@@ -56,7 +56,8 @@ router.get('/user/:_id', async function (req, res) {
 
 router.get('/albumlist/:_id', async function (req, res) {
   try {
-    const albums = await albumSchema.find();
+    const { _id } = req.params;
+    const albums = await albumSchema.find({"album_listShow._id": _id});
 
     res.status(200).json({
       albums
