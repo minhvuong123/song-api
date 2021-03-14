@@ -24,10 +24,10 @@ router.get('/', async function (req, res) {
   }
 })
 
-router.get('/:name', async function (req, res) {
+router.get('/:_id', async function (req, res) {
   try {
-    const { name } = req.params;
-    const album = await albumSchema.findOne({ album_slug: name });
+    const { _id } = req.params;
+    const album = await albumSchema.findOne({ _id });
 
     res.status(200).json({
       album

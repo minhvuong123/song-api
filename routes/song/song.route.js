@@ -4,27 +4,14 @@ const path = require('path');
 const { rootPath } = require('../../utils');
 const { v1: uuid } = require('uuid');
 const songSchema = require('../../models/song/song.model');
-const countrySchema = require('../../models/country/country.model');
 const singerSchema = require('../../models/singer/singer.model');
 const mm = require('music-metadata');
 
-router.get('/', async function (req, res) {
-  try {
-    const songs = await songSchema.find();
-    res.status(200).json({
-      songs
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Server error'
-    })
-  }
-})
 
-router.get('/:song_id_playlist', async function (req, res) {
+router.get('/:albumId', async function (req, res) {
   try {
-    const { song_id_playlist } = req.params;
-    const songs = await songSchema.find({ song_id_playlist});
+    const { albumId } = req.params;
+    const songs = await songSchema.find({ song_id_albums: albumId});
     res.status(200).json({
       songs
     });
@@ -39,6 +26,20 @@ router.get('/song/:_id', async function (req, res) {
   try {
     const { _id } = req.params;
     const song = await songSchema.findOne({ _id});
+    res.status(200).json({
+      song
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
+router.get('/albums/:alBumId', async function (req, res) {
+  try {
+    const { alBumId } = req.params;
+    const song = await songSchema.findOne({ song_id_albums: alBumId});
     res.status(200).json({
       song
     });
