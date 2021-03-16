@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { removeAccents } = require('../../utils');
+const path = require('path');
+const { rootPath, removeAccents } = require('../../utils');
+const { v1: uuid } = require('uuid');
 const categorySchema = require('../../models/category/category.model');
 
 router.get('/', async function (req, res) {
@@ -35,10 +37,22 @@ router.get('/:page/:limit', async function (req, res) {
 
 router.post('/', async function (req, res) {
   try {
+    console.log(req.body.category);
+    const base64Image = req.body.category.category_url_image ? req.body.category.category_url_image.split(";base64,")[1] : '';
+    const extenImage = req.body.imageType;
+    const imageName = uuid();
+    const saveImageUrl = `${path.join(rootPath, 'public/images/category')}\\${imageName}.${extenImage}`;
     const convertString = removeAccents(req.body.category.category_name).replace(/ /g, '-');
+
+    if (base64Image) {
+      await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64');
+      req.body.category.category_url_image = base64Image ? `static/images/category/${imageName}.${extenImage}` : '';
+    }
+
     const category = new categorySchema({
       category_name: req.body.category.category_name,
       category_slug: convertString,
+      category_url_image: req.body.category.category_url_image,
       created_at: req.body.category.created_at
     });
     const result = await category.save();

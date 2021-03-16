@@ -7,6 +7,9 @@ const categorySchema = new mongoose.Schema({
   category_slug: {
     type: String
   },
+  category_url_image: {
+    type: String
+  },
   created_at: {
     type: String
   }
