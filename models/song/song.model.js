@@ -14,6 +14,10 @@ const songSchema = new mongoose.Schema({
     type: [singerSchema.schema],
     default: []
   },
+  song_category: {
+    type: String,
+    default: ''
+  },
   song_url_image: {
     type: String
   },

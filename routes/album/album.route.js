@@ -186,6 +186,23 @@ router.patch('/', async function (req, res) {
   }
 })
 
+router.patch('/view/:_id', async function (req, res) {
+  try {
+    const { _id } = req.params;
+    const album = await albumSchema.where({ _id }).updateOne({$inc: { album_view: 1 }});
+    if (album.ok === 1) {
+      res.status(200).json({
+        status: 'ok'
+      });
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'Server error'
+    });
+  }
+})
+
 
 router.post('/delete', async function (req, res) {
   try {

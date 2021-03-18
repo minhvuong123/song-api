@@ -50,6 +50,20 @@ router.get('/albums/:alBumId', async function (req, res) {
   }
 })
 
+router.get('/category/:_id', async function (req, res) {
+  try {
+    const { _id } = req.params;
+    const songs = await songSchema.find({song_category: _id});
+    res.status(200).json({
+      songs
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
 router.get('/user/:_id', async function (req, res) {
   try {
     const { _id } = req.params;
@@ -127,6 +141,23 @@ router.post('/', async function (req, res) {
     res.status(500).json({
       message: 'Server error'
     })
+  }
+})
+
+router.patch('/view/:_id', async function (req, res) {
+  try {
+    const { _id } = req.params;
+    const song = await songSchema.where({ _id }).updateOne({$inc: { song_view: 1 }});
+    if (song.ok === 1) {
+      res.status(200).json({
+        status: 'ok'
+      });
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'Server error'
+    });
   }
 })
 
