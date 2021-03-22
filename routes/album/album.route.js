@@ -84,6 +84,21 @@ router.get('/category/:_id', async function (req, res) {
   }
 })
 
+router.get('/category/:_id/:limit', async function (req, res) {
+  try {
+    const { _id, limit } = req.params;
+    const albums = await albumSchema.find({"album_category._id": _id}).limit(+limit || 5);
+
+    res.status(200).json({
+      albums
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
 router.get('/:page/:limit', async function (req, res) {
   try {
     const page = +req.params.page - 1 || 0;
