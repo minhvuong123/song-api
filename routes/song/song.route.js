@@ -8,7 +8,7 @@ const singerSchema = require('../../models/singer/singer.model');
 const mm = require('music-metadata');
 
 
-router.get('/:albumId', async function (req, res) {
+router.get('/album/:albumId', async function (req, res) {
   try {
     const { albumId } = req.params;
     const songs = await songSchema.find({ song_id_albums: albumId});
@@ -68,6 +68,20 @@ router.get('/user/:_id', async function (req, res) {
   try {
     const { _id } = req.params;
     const songs = await songSchema.find({ song_user_id: _id});
+    res.status(200).json({
+      songs
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Server error'
+    })
+  }
+})
+
+router.get('/new', async function (req, res) {
+  try {
+    let songs = await songSchema.find().sort({ created_at: -1 }).limit(100);
+    songs = songs.sort((a, b) => b.song_view - a.song_view);
     res.status(200).json({
       songs
     });
