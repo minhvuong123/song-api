@@ -128,11 +128,13 @@ router.patch('/', async function (req, res) {
 
 router.post('/register', async function (req, res) {
   try {
+    console.log(req.body);
     const user_email = req.body.user.user_email;
     const user_phone = req.body.user.user_phone;
     const user_password = bcrypt.hashSync(req.body.user.user_password, 10);
     const created_at = req.body.user.created_at;
     const user = new userSchema({ user_email, user_phone, user_password, created_at });
+    console.log(user);
     const result = await user.save();
 
     if (Object.keys(result).length > 0) {
