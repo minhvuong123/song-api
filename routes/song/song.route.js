@@ -112,6 +112,7 @@ router.get('/:page/:limit', async function (req, res) {
 router.post('/', async function (req, res) {
   try {
     const base64Mp3 = req.body.song.song_url_music.split(";base64,")[1];
+    const base64Image = req.body.song.song_url_image.split(";base64,")[1];
     const imageName = uuid();
     const mp3Name = uuid();
     const saveImageUrl = `${path.join(rootPath, 'public/images/song')}\\${imageName}.jpeg`;
@@ -120,8 +121,8 @@ router.post('/', async function (req, res) {
     await require("fs").writeFileSync(sageMp3Url, base64Mp3, 'base64'); // save mp3 file
 
     const metadata = await mm.parseFile(sageMp3Url); // read metadata
-  
-    await require("fs").writeFileSync(saveImageUrl, mm.selectCover(metadata.common.picture).data, 'binary'); // save image file
+    
+    await require("fs").writeFileSync(saveImageUrl, base64Image, 'base64'); // save image file
 
     const singers = [];
 
