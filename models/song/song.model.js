@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const countrySchema = require('../country/country.model');
 const singerSchema = require('../singer/singer.model');
 
 const songSchema = new mongoose.Schema({

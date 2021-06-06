@@ -19,6 +19,7 @@ const categories = require('./routes/category/category.route');
 const singers = require('./routes/singer/singer.route');
 const countries = require('./routes/country/country.route');
 const albumList = require('./routes/albumList/albumList.route');
+const search = require('./routes/search/search.route');
 
 app.use('/users', users);
 app.use('/songs', songs);
@@ -27,6 +28,7 @@ app.use('/categories', categories);
 app.use('/singers', singers);
 app.use('/countries', countries);
 app.use('/albumList', albumList);
+app.use('/search', search);
 
 mongoose.connect('mongodb://localhost/songApp', { useNewUrlParser: true, useUnifiedTopology: true });
 const connect = mongoose.connection;
