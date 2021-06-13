@@ -41,6 +41,10 @@ const albumSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  album_added: {
+    type: String,
+    default: 'admin'
+  },
   created_at: {
     type: String
   }
