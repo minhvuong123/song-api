@@ -31,6 +31,10 @@ const songSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  song_personal_id_albums: {
+    type: String,
+    default: ''
+  },
   song_duration: {
     type: Number,
     default: 0

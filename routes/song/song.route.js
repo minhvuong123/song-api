@@ -11,7 +11,7 @@ const mm = require('music-metadata');
 router.get('/album/:albumId', async function (req, res) {
   try {
     const { albumId } = req.params;
-    const songs = await songSchema.find({ song_id_albums: albumId});
+    const songs = await songSchema.find({ $or: [{ song_id_albums: albumId }, { song_personal_id_albums: albumId }]});
     res.status(200).json({
       songs
     });
@@ -36,10 +36,10 @@ router.get('/song/:_id', async function (req, res) {
   }
 })
 
-router.get('/albums/:alBumId', async function (req, res) {
+router.get('/albums/:albumId', async function (req, res) {
   try {
-    const { alBumId } = req.params;
-    const song = await songSchema.findOne({ song_id_albums: alBumId});
+    const { albumId } = req.params;
+    const song = await songSchema.findOne({ song_id_albums: albumId});
     res.status(200).json({
       song
     });
